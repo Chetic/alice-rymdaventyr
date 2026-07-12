@@ -6,6 +6,7 @@ import { view, makeCanvas, txt, rainbowText, rr, drawCoin, glow, PS, starPath } 
 import { setScheme } from '../input.js';
 import { SAVE, hasSave, resetSave } from '../save.js';
 import { AUD } from '../audio.js';
+import { TTS } from '../speech.js';
 import { drawGirl, drawUnicorn, WHO } from '../chars.js';
 import { SceneBase, NAV } from './base.js';
 
@@ -26,6 +27,7 @@ class TitleScene extends SceneBase {
   enter() {
     this.baseEnter();
     setScheme('none');
+    this.greeted = AUD.ready;   // hälsa bara vid första ljudstarten
     this.stars = [];
     for (let i = 0; i < 130; i++) {
       this.stars.push({ x: rand(0, BGW), y: rand(0, 640), r: rand(1, 3.2), ph: rand(0, TAU), sp: rand(1.5, 4) });
@@ -37,6 +39,10 @@ class TitleScene extends SceneBase {
 
   update(dt) {
     this.tick(dt);
+    if (!this.greeted && AUD.ready) {
+      this.greeted = true;
+      TTS.say('Hej! Jag heter Alice! Ska vi flyga ut i rymden och hämta pappa?', 'alice', { queue: true });
+    }
     this.shootTimer -= dt;
     if (this.shootTimer <= 0 && !this.shoot) {
       this.shoot = { x: rand(300, BGW - 500), y: rand(60, 260), vx: -rand(500, 800), vy: rand(140, 240), life: 1 };
@@ -133,6 +139,22 @@ class TitleScene extends SceneBase {
     txt(ctx, '✨ Ett rymdäventyr ✨', cx, 172, { size: 40, color: '#e8dcff', shadow: true });
     rainbowText(ctx, 'ALICE', cx, 285, 150);
     txt(ctx, 'och den kallaste planeten', cx, 398, { size: 56, bold: true, color: '#fff', stroke: 'rgba(60,20,90,0.9)', strokeW: 9, shadow: true });
+
+    // musiken väntar på första trycket (autoplay-regel) — visa det tydligt!
+    if (!AUD.ready) {
+      const pu = 1 + Math.sin(t * 4) * 0.05;
+      ctx.save();
+      ctx.translate(cx, 476);
+      ctx.scale(pu, pu);
+      rr(ctx, -290, -34, 580, 68, 34);
+      ctx.fillStyle = 'rgba(255,210,74,0.92)';
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+      txt(ctx, '🔊 Tryck på skärmen för musik!', 0, 2, { size: 32, bold: true, color: '#5a3a00' });
+      ctx.restore();
+    }
 
     // knappar
     this.btns = [];

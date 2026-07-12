@@ -23,6 +23,7 @@ function defaults() {
     flags: {},              // planeUnlocked, rocketBuilt, starKey, suit, compass, rainbowFuel, foundPapa
     music: true,
     sfx: true,
+    tts: true,
     finished: false
   };
 }

@@ -6,6 +6,7 @@ import { view, rr, txt, panel, drawCoin, glow } from './render.js';
 import { IN, drawControls } from './input.js';
 import { SAVE, persist } from './save.js';
 import { AUD } from './audio.js';
+import { TTS } from './speech.js';
 import { drawPortrait, WHO } from './chars.js';
 import { NAV } from './scenes/base.js';
 
@@ -41,13 +42,21 @@ export const HUD = {
   },
 
   objective: function (text) { state.objective = text; },
-  toast: function (text, dur) { state.toasts.push({ text: text, t: 0, max: dur || 2.6 }); },
-  hint: function (text) { state.hintText = text; state.hintT = 7; AUD.sfx('magic'); },
+  toast: function (text, dur) {
+    state.toasts.push({ text: text, t: 0, max: dur || 2.6 });
+    TTS.say(text, 'narrator', { queue: true });
+  },
+  hint: function (text) {
+    state.hintText = text; state.hintT = 7;
+    AUD.sfx('magic');
+    TTS.say(text, 'narrator', { queue: true });
+  },
   bumpCoins: function () { state.coinBump = 1; },
 
   dialog: function (lines, cb) {
     state.dialog = { lines: lines, idx: 0, shown: 0, cb: cb || null, wrapped: null };
     AUD.sfx('pop');
+    TTS.say(lines[0].text, lines[0].who);
   },
   dialogActive: function () { return !!state.dialog; },
   paused: function () { return state.paused; },
@@ -90,6 +99,7 @@ export const HUD = {
     else if (id === 'restart') { state.paused = false; if (NAV.go) NAV.go(state.sceneName); }
     else if (id === 'music') { AUD.setMusicOn(!SAVE.music); persist(); }
     else if (id === 'sfx') { AUD.setSfxOn(!SAVE.sfx); persist(); }
+    else if (id === 'tts') { TTS.setOn(!SAVE.tts); if (SAVE.tts) TTS.say('Nu läser jag högt för dig!', 'narrator'); }
     else if (id === 'title') { state.paused = false; if (NAV.go) NAV.go('title'); }
   },
 
@@ -105,7 +115,10 @@ export const HUD = {
     if (d.idx >= d.lines.length) {
       const cb = d.cb;
       state.dialog = null;
+      TTS.stop();
       if (cb) cb();
+    } else {
+      TTS.say(d.lines[d.idx].text, d.lines[d.idx].who);
     }
   },
 
@@ -262,6 +275,7 @@ export const HUD = {
       { id: 'restart', label: '↺  ' + TXT.restart },
       { id: 'music', label: (SAVE.music ? '🎵  ' : '🔇  ') + TXT.music + ': ' + (SAVE.music ? 'PÅ' : 'AV') },
       { id: 'sfx', label: (SAVE.sfx ? '🔔  ' : '🔕  ') + TXT.sfx + ': ' + (SAVE.sfx ? 'PÅ' : 'AV') },
+      { id: 'tts', label: (SAVE.tts ? '🗣️  ' : '🤐  ') + 'Uppläsning: ' + (SAVE.tts ? 'PÅ' : 'AV') },
       { id: 'title', label: '🏠  ' + TXT.toTitle }
     ];
     const IH = 96, GAP = 26;

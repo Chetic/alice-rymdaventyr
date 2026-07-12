@@ -21,7 +21,11 @@ export const AUD = {
   ready: false,
 
   init: function () {
-    if (this.ready) return;
+    if (this.ready) {
+      // väck en somnad/suspenderad kontext (t.ex. efter flikbyte)
+      if (ctx && ctx.state !== 'running') { try { ctx.resume(); } catch (e) {} }
+      return;
+    }
     const AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return;
     ctx = new AC();

@@ -8,6 +8,7 @@ import { stepWorld, engineRef } from './world.js';
 import { SAVE, loadSave } from './save.js';
 import { AUD } from './audio.js';
 import { HUD } from './hud.js';
+import { TTS } from './speech.js';
 import { NAV } from './scenes/base.js';
 import { titleScene } from './scenes/title.js';
 import { homeScene } from './scenes/home.js';
@@ -59,6 +60,7 @@ function switchTo(name, params) {
 function doSwitch() {
   const p = pendingScene;
   pendingScene = null;
+  TTS.stop();
   if (current && current.exit) current.exit();
   current = SCENES[p.name];
   HUD.reset(p.name);
@@ -139,8 +141,10 @@ function boot() {
   loadSave();
   NAV.go = switchTo;
 
-  // ljudmotorn väcks av första trycket (autoplay-policy)
-  canvas.addEventListener('pointerdown', function () { AUD.init(); }, { once: true });
+  // ljudmotorn väcks av tryck (autoplay-policy) — varje tryck är en chans
+  // att starta/återuppta ljudet, så menyn aldrig fastnar i tystnad
+  canvas.addEventListener('pointerdown', function () { AUD.init(); });
+  TTS.init();
 
   // vänligt felmeddelande + felsökningshjälp
   window.onerror = function (msg, src, line) {
