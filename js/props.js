@@ -292,3 +292,146 @@ export function drawActionBubble(ctx, x, y, t) {
   ctx.fillText('✋', 0, 2);
   ctx.restore();
 }
+
+// Raketen (nos uppåt). opts: {flame:0..1, alice, cone (default true), scale}
+export function drawRocket(ctx, x, y, angle, t, opts) {
+  const o = opts || {};
+  const s = o.scale === undefined ? 1 : o.scale;
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(angle || 0);
+  ctx.scale(s, s);
+
+  // låga (ritas först, bakom)
+  const fl = o.flame || 0;
+  if (fl > 0.02) {
+    const len = 90 + fl * 130 + Math.sin(t * 31) * 18 * fl;
+    const grad = ctx.createLinearGradient(0, 96, 0, 96 + len);
+    grad.addColorStop(0, 'rgba(255,255,255,0.95)');
+    grad.addColorStop(0.3, 'rgba(255,214,90,0.9)');
+    grad.addColorStop(0.7, 'rgba(255,110,60,0.75)');
+    grad.addColorStop(1, 'rgba(255,60,40,0)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.moveTo(-26, 96);
+    ctx.quadraticCurveTo(-14, 96 + len * 0.7, 0, 96 + len);
+    ctx.quadraticCurveTo(14, 96 + len * 0.7, 26, 96);
+    ctx.closePath();
+    ctx.fill();
+    // inre kärna
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx.beginPath();
+    ctx.moveTo(-12, 96);
+    ctx.quadraticCurveTo(0, 96 + len * 0.5, 12, 96);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  // fenor (guld)
+  ctx.fillStyle = '#e8b23a';
+  ctx.beginPath();
+  ctx.moveTo(-34, 30);
+  ctx.quadraticCurveTo(-66, 70, -58, 108);
+  ctx.lineTo(-30, 88);
+  ctx.closePath();
+  ctx.fill();
+  ctx.beginPath();
+  ctx.moveTo(34, 30);
+  ctx.quadraticCurveTo(66, 70, 58, 108);
+  ctx.lineTo(30, 88);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = '#a97b16';
+  ctx.lineWidth = 3;
+  ctx.stroke();
+
+  // kropp
+  const g = ctx.createLinearGradient(-38, 0, 38, 0);
+  g.addColorStop(0, '#cfd4e2');
+  g.addColorStop(0.35, '#ffffff');
+  g.addColorStop(1, '#b8bfd2');
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.moveTo(-36, -40);
+  ctx.quadraticCurveTo(-40, 60, -30, 92);
+  ctx.lineTo(30, 92);
+  ctx.quadraticCurveTo(40, 60, 36, -40);
+  ctx.closePath();
+  ctx.fill();
+  ctx.strokeStyle = '#8a90a4';
+  ctx.lineWidth = 3;
+  ctx.stroke();
+
+  // rosa ränder
+  ctx.fillStyle = '#ff6bcb';
+  ctx.fillRect(-33, 52, 66, 14);
+  // munstycke
+  ctx.fillStyle = '#5a6274';
+  ctx.beginPath();
+  ctx.moveTo(-26, 92);
+  ctx.lineTo(26, 92);
+  ctx.lineTo(18, 104);
+  ctx.lineTo(-18, 104);
+  ctx.closePath();
+  ctx.fill();
+
+  // noskon
+  if (o.cone !== false) {
+    const cg = ctx.createLinearGradient(-30, -110, 30, -40);
+    cg.addColorStop(0, '#ff9ed9');
+    cg.addColorStop(1, '#e84f9e');
+    ctx.fillStyle = cg;
+    ctx.beginPath();
+    ctx.moveTo(-36, -38);
+    ctx.quadraticCurveTo(-20, -102, 0, -116);
+    ctx.quadraticCurveTo(20, -102, 36, -38);
+    ctx.closePath();
+    ctx.fill();
+    ctx.strokeStyle = '#a82e74';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    // guldstjärna på nosen
+    ctx.fillStyle = '#ffd24a';
+    starPath(ctx, 0, -72, 12, 5.4, 5, -Math.PI / 2);
+    ctx.fill();
+  } else {
+    // öppen topp med bultar
+    ctx.fillStyle = '#8a90a4';
+    ctx.fillRect(-36, -44, 72, 10);
+    ctx.fillStyle = '#5a6274';
+    for (let i = -1; i <= 1; i++) {
+      ctx.beginPath();
+      ctx.arc(i * 22, -39, 4, 0, TAU);
+      ctx.fill();
+    }
+  }
+
+  // runt fönster med Alice
+  ctx.fillStyle = '#ffd24a';
+  ctx.beginPath();
+  ctx.arc(0, 6, 26, 0, TAU);
+  ctx.fill();
+  ctx.fillStyle = o.alice ? '#bfe8ff' : '#7ea8c8';
+  ctx.beginPath();
+  ctx.arc(0, 6, 20, 0, TAU);
+  ctx.fill();
+  if (o.alice) {
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(0, 6, 20, 0, TAU);
+    ctx.clip();
+    // Alices ansikte i fönstret
+    ctx.fillStyle = '#ffdbc4';
+    ctx.beginPath(); ctx.arc(0, 10, 14, 0, TAU); ctx.fill();
+    ctx.fillStyle = '#8a5a2b';
+    ctx.beginPath(); ctx.arc(0, 4, 14, Math.PI * 0.95, Math.PI * 2.05); ctx.fill();
+    ctx.fillStyle = '#2b1a2e';
+    ctx.beginPath(); ctx.arc(-5, 11, 2, 0, TAU); ctx.fill();
+    ctx.beginPath(); ctx.arc(5, 11, 2, 0, TAU); ctx.fill();
+    ctx.strokeStyle = '#8c3a55';
+    ctx.lineWidth = 1.6;
+    ctx.beginPath(); ctx.arc(0, 14, 5, 0.3, Math.PI - 0.3); ctx.stroke();
+    ctx.restore();
+  }
+  ctx.restore();
+}

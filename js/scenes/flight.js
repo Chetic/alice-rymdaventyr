@@ -58,7 +58,8 @@ class FlightScene extends SceneBase {
     this.doneDialog = false;
 
     this.plane = M.Bodies.rectangle(260, groundY(260) - 46, 150, 50, {
-      frictionAir: 0, collisionFilter: { category: CAT.PLAYER, mask: 0 }
+      frictionAir: 0, sleepThreshold: Infinity,
+      collisionFilter: { category: CAT.PLAYER, mask: 0 }
     });
     addToWorld(this.plane);
 
