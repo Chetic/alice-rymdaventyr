@@ -124,22 +124,23 @@ class MoonScene extends SceneBase {
       });
     }
 
-    // interaktion: speglar + raket
+    // interaktion: speglar + raket (speglarna sitter högt — närhet räknas i sidled)
     this.near = null;
-    if (!this.solved) {
+    if (!this.solved && this.met) {
+      let bestI = -1, bestD = 240;
       for (let i = 0; i < this.mirrors.length; i++) {
-        const m = this.mirrors[i];
-        if (dist(p.x, p.y, m.x, m.y) < 150) {
-          this.near = { kind: 'mirror', i: i, x: m.x, y: m.y - 110 };
-          break;
-        }
+        const d = Math.abs(p.x - this.mirrors[i].x);
+        if (d < bestD) { bestD = d; bestI = i; }
+      }
+      if (bestI >= 0) {
+        this.near = { kind: 'mirror', i: bestI, x: this.mirrors[bestI].x, y: this.mirrors[bestI].y - 110 };
       }
     }
     if (!this.near && Math.abs(p.x - ROCKET_X) < 170) {
       this.near = { kind: 'rocket', x: ROCKET_X, y: 640 };
     }
     if (inp.actionEdge && this.near && !HUD.blocked()) {
-      if (this.near.kind === 'mirror') this.turnMirror(this.near.i);
+      if (this.near.kind === 'mirror') HUD.toast('Tryck PÅ spegeln du vill vrida! 👆');
       else if (this.near.kind === 'rocket') this.leave();
     }
 
@@ -181,9 +182,10 @@ class MoonScene extends SceneBase {
   onTap(x, y) {
     if (HUD.blocked() || this.solved) return;
     const wx = x - this.cam.ox, wy = y - this.cam.oy;
+    // tryck direkt på en spegel för att vrida den — inget avståndskrav
     for (let i = 0; i < this.mirrors.length; i++) {
       const m = this.mirrors[i];
-      if (dist(wx, wy, m.x, m.y) < 90 && dist(this.walker.pos().x, this.walker.pos().y, m.x, m.y) < 260) {
+      if (dist(wx, wy, m.x, m.y) < 115) {
         this.turnMirror(i);
         return;
       }
@@ -216,8 +218,8 @@ class MoonScene extends SceneBase {
           bestIx = ox + dx * t; bestIy = oy + dy * t;
         }
       }
-      const ex = bestI >= 0 ? bestIx : ox + dx * 2600;
-      const ey = bestI >= 0 ? bestIy : oy + dy * 2600;
+      const ex = bestI >= 0 ? bestIx : ox + dx * 850;
+      const ey = bestI >= 0 ? bestIy : oy + dy * 850;
       this.beamSegs.push({ x1: ox, y1: oy, x2: ex, y2: ey });
       // fladdermöss nära strålen?
       for (let pi = 0; pi < PERCHES.length; pi++) {
@@ -290,6 +292,10 @@ class MoonScene extends SceneBase {
       ctx.lineWidth = 4;
       ctx.stroke();
     }
+
+    // svävande månstensplattformar (samma lägen som fysiken!)
+    drawMoonPlatform(ctx, 1780, 640, 240, t);
+    drawMoonPlatform(ctx, 2450, 500, 240, t + 2);
 
     // marken: mångrå med kratrar
     drawMoonGround(ctx, this.cam);
@@ -468,6 +474,31 @@ function drawBatSmall(ctx, x, y, wt) {
     ctx.restore();
   }
   ctx.beginPath(); ctx.arc(0, 0, 4.5, 0, TAU); ctx.fill();
+  ctx.restore();
+}
+
+function drawMoonPlatform(ctx, x, y, w, t) {
+  ctx.save();
+  ctx.translate(x, y + 13);
+  // magiskt sken under (visar att den svävar)
+  glow(ctx, 0, 26, 90, '#c9a8ff', 0.22 + 0.08 * Math.sin(t * 2));
+  const g = ctx.createLinearGradient(0, -16, 0, 22);
+  g.addColorStop(0, '#cfc9de');
+  g.addColorStop(1, '#8a84a0');
+  ctx.fillStyle = g;
+  rr(ctx, -w / 2, -14, w, 30, 14);
+  ctx.fill();
+  ctx.strokeStyle = '#6a6480';
+  ctx.lineWidth = 3;
+  ctx.stroke();
+  // små kratrar på ytan
+  ctx.fillStyle = 'rgba(90,84,110,0.55)';
+  ctx.beginPath(); ctx.ellipse(-w * 0.26, -4, 16, 6, 0, 0, TAU); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(w * 0.18, 2, 12, 5, 0, 0, TAU); ctx.fill();
+  // gnistor
+  ctx.fillStyle = 'rgba(233,215,255,0.8)';
+  starPath(ctx, w * 0.38, -18, 6, 2.6, 4, t);
+  ctx.fill();
   ctx.restore();
 }
 

@@ -2,7 +2,7 @@
 // runt månen och stora barnvänliga knappar.
 
 import { VH, PAL, RAINBOW, TXT, TAU, rand } from '../config.js';
-import { view, makeCanvas, txt, rainbowText, rr, drawCoin, glow, PS, starPath } from '../render.js';
+import { view, makeCanvas, txt, rainbowText, rr, drawCoin, glow, PS, starPath, panel } from '../render.js';
 import { setScheme } from '../input.js';
 import { SAVE, hasSave, resetSave } from '../save.js';
 import { AUD } from '../audio.js';
@@ -28,6 +28,8 @@ class TitleScene extends SceneBase {
     this.baseEnter();
     setScheme('none');
     this.greeted = AUD.ready;   // hälsa bara vid första ljudstarten
+    this.picker = false;
+    this.pickBtns = [];
     this.stars = [];
     for (let i = 0; i < 130; i++) {
       this.stars.push({ x: rand(0, BGW), y: rand(0, 640), r: rand(1, 3.2), ph: rand(0, TAU), sp: rand(1.5, 4) });
@@ -57,6 +59,20 @@ class TitleScene extends SceneBase {
   }
 
   onTap(x, y) {
+    // banväljaren fångar trycken när den är öppen
+    if (this.picker) {
+      for (let i = 0; i < this.pickBtns.length; i++) {
+        const b = this.pickBtns[i];
+        if (x > b.x && x < b.x + b.w && y > b.y && y < b.y + b.h) {
+          AUD.init();
+          AUD.sfx('click');
+          if (b.id === 'close') this.picker = false;
+          else { this.picker = false; NAV.go(b.id); }
+          return;
+        }
+      }
+      return;
+    }
     for (let i = 0; i < this.btns.length; i++) {
       const b = this.btns[i];
       if (x > b.x && x < b.x + b.w && y > b.y && y < b.y + b.h) {
@@ -66,6 +82,7 @@ class TitleScene extends SceneBase {
         else if (b.id === 'cont') NAV.go(SAVE.progress);
         else if (b.id === 'new') { resetSave(); NAV.go('home'); }
         else if (b.id === 'free') NAV.go('flight');   // fri flygtur bland ringarna!
+        else if (b.id === 'levels') { this.picker = true; TTS.say('Välj bana!', 'narrator', { queue: true }); }
         else if (b.id === 'install' && window.__installPrompt) {
           const p = window.__installPrompt;
           window.__installPrompt = null;
@@ -173,7 +190,57 @@ class TitleScene extends SceneBase {
       this.addBtn(ctx, 'install', TXT.install, cx, y, 460, 84, '#3aa76d', t); y += 112;
     }
 
+    // banväljar-knapp nere i vänstra hörnet (bra om spelet krånglar!)
+    this.addBtn(ctx, 'levels', '🗺️ Välj bana', 250, VH - 106, 380, 76, '#6a4a8a', t);
+
     txt(ctx, 'Ett spel av Alice & Pappa 💜', cx, VH - 34, { size: 26, color: '#b9a8d8' });
+
+    if (this.picker) this.drawPicker(ctx, t);
+  }
+
+  drawPicker(ctx, t) {
+    this.pickBtns = [];
+    ctx.fillStyle = 'rgba(8,3,20,0.8)';
+    ctx.fillRect(0, 0, view.w, VH);
+    const CHAPTERS = [
+      { id: 'home', l: '🏡 Hemma' }, { id: 'flight', l: '✈️ Flygturen' },
+      { id: 'spaceport', l: '🧑‍🚀 Rymdbasen' }, { id: 'moon', l: '🌙 Månen' },
+      { id: 'asteroid', l: '⭐ Guldasteroiden' }, { id: 'europa', l: '💧 Europa' },
+      { id: 'saturn', l: '🪐 Saturnus' }, { id: 'neptune', l: '❄️ Neptunus' },
+      { id: 'homecoming', l: '🌍 Hemresan' }, { id: 'party', l: '🎉 Festen' }
+    ];
+    const BW = 500, BH = 104, GX = 36, GY = 26;
+    const X0 = view.w / 2 - BW - GX / 2;
+    const Y0 = 200;
+    const panelW = BW * 2 + GX + 100;
+    panel(ctx, view.w / 2 - panelW / 2, Y0 - 110, panelW, 110 + 5 * (BH + GY) + 130, { r: 40 });
+    txt(ctx, '🗺️ VÄLJ BANA', view.w / 2, Y0 - 48, { size: 52, bold: true, color: PAL.gold, stroke: 'rgba(40,16,0,0.7)', strokeW: 8 });
+    for (let i = 0; i < CHAPTERS.length; i++) {
+      const col = i % 2, row = Math.floor(i / 2);
+      const bx = X0 + col * (BW + GX);
+      const by = Y0 + row * (BH + GY);
+      rr(ctx, bx, by, BW, BH, 30);
+      const g = ctx.createLinearGradient(0, by, 0, by + BH);
+      g.addColorStop(0, 'rgba(120,70,190,0.95)');
+      g.addColorStop(1, 'rgba(78,42,130,0.95)');
+      ctx.fillStyle = g;
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255,210,74,0.85)';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+      txt(ctx, CHAPTERS[i].l, bx + BW / 2, by + BH / 2, { size: 34, bold: true, color: '#fff' });
+      this.pickBtns.push({ id: CHAPTERS[i].id, x: bx, y: by, w: BW, h: BH });
+    }
+    // stäng
+    const cy = Y0 + 5 * (BH + GY) + 20;
+    rr(ctx, view.w / 2 - 160, cy, 320, 80, 40);
+    ctx.fillStyle = '#7a3a5a';
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+    txt(ctx, 'Stäng ✖', view.w / 2, cy + 40, { size: 32, bold: true, color: '#fff' });
+    this.pickBtns.push({ id: 'close', x: view.w / 2 - 160, y: cy, w: 320, h: 80 });
   }
 
   addBtn(ctx, id, label, cx, y, w, h, color, t) {

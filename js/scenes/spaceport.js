@@ -343,7 +343,7 @@ class SpaceportScene extends SceneBase {
     if (!this.done.code && Math.abs(p.x - PANEL_X) < 420) {
       for (let i = 0; i < 3; i++) {
         const dx = PANEL_X - 160 + i * 160;
-        if (Math.abs(wx - dx) < 70 && Math.abs(wy - 700) < 90) {
+        if (Math.abs(wx - dx) < 70 && Math.abs(wy - 810) < 90) {
           this.dials[i] = (this.dials[i] + 1) % 10;
           this.dialTaps++;
           AUD.sfx('click');
@@ -491,39 +491,39 @@ function drawCodeShack(ctx, t, dials, done, ghost) {
   ctx.strokeStyle = '#3a3f52';
   ctx.lineWidth = 5;
   ctx.stroke();
-  txt(ctx, '🔢 KONTROLLRUM', x, 570, { size: 30, bold: true, color: '#ffd24a' });
-  // pappas lapp
-  ctx.save();
-  ctx.translate(x, 640);
-  ctx.rotate(-0.03);
-  ctx.fillStyle = '#fff8e8';
-  rr(ctx, -190, -34, 380, 68, 8);
-  ctx.fill();
-  ctx.strokeStyle = '#d0c0a0';
-  ctx.lineWidth = 2;
-  ctx.stroke();
-  let noteStr = '';
-  for (let i = 0; i < 3; i++) noteStr += CODE_TEXT[i] + (i < 2 ? '   •   ' : '');
-  txt(ctx, noteStr, 0, 0, { size: 30, bold: true, color: '#6a4a8a' });
-  txt(ctx, 'Pappas kod 💜', 120, -46, { size: 20, color: '#b9a8d8' });
-  ctx.restore();
-  // dialer
+  txt(ctx, '🔢 KONTROLLRUM', x, 562, { size: 30, bold: true, color: '#ffd24a' });
+  txt(ctx, 'Pappas kod 💜', x, 606, { size: 22, color: '#b9a8d8' });
+  // varje tal på en egen lapp RAKT OVANFÖR sin ratt
   for (let i = 0; i < 3; i++) {
     const dx = x - 160 + i * 160;
     const ok = done;
-    rr(ctx, dx - 55, 700 - 70, 110, 140, 16);
+    // lapp med talet
+    ctx.save();
+    ctx.translate(dx, 662);
+    ctx.rotate((i - 1) * 0.02);
+    ctx.fillStyle = '#fff8e8';
+    rr(ctx, -64, -32, 128, 64, 10);
+    ctx.fill();
+    ctx.strokeStyle = '#d0c0a0';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+    txt(ctx, CODE_TEXT[i], 0, 1, { size: 36, bold: true, color: '#6a4a8a' });
+    ctx.restore();
+    // pil ner till ratten
+    txt(ctx, '▼', dx, 716, { size: 24, color: '#ffd24a', alpha: ok ? 0.4 : 0.6 + 0.3 * Math.sin(t * 4 + i) });
+    // ratt
+    rr(ctx, dx - 55, 810 - 70, 110, 140, 16);
     ctx.fillStyle = ok ? '#2a5e3a' : '#20242f';
     ctx.fill();
     ctx.strokeStyle = ok ? '#59d666' : '#ffd24a';
     ctx.lineWidth = 4;
     ctx.stroke();
-    txt(ctx, String(dials[i]), dx, 700, { size: 72, bold: true, color: ok ? '#a8ffb8' : '#fff' });
-    if (!ok) {
-      txt(ctx, '▲', dx, 700 - 92, { size: 26, color: '#ffd24a', alpha: 0.6 + 0.3 * Math.sin(t * 4 + i) });
-      if (ghost) txt(ctx, String(CODE_ANSWER[i]), dx + 36, 700 - 48, { size: 24, color: '#59d666', alpha: 0.5 });
+    txt(ctx, String(dials[i]), dx, 810, { size: 72, bold: true, color: ok ? '#a8ffb8' : '#fff' });
+    if (!ok && ghost) {
+      txt(ctx, String(CODE_ANSWER[i]), dx + 38, 762, { size: 24, color: '#59d666', alpha: 0.5 });
     }
   }
-  if (done) txt(ctx, 'UPPLÅST ✅', x, 850, { size: 30, bold: true, color: '#59d666' });
+  if (done) txt(ctx, 'UPPLÅST ✅', x, 946, { size: 30, bold: true, color: '#59d666' });
 }
 
 function drawFuelStation(ctx, t, sc) {

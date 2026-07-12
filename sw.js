@@ -1,7 +1,7 @@
 // Service worker: cache-först så att hela äventyret fungerar offline
 // (t.ex. installerad som app på plattan). Bumpa CACHE vid varje release.
 
-var CACHE = 'alice-v4';
+var CACHE = 'alice-v5';
 var FILES = [
   './',
   './index.html',
