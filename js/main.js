@@ -16,6 +16,8 @@ import { spaceportScene } from './scenes/spaceport.js';
 import { travelMoon, travelAsteroid, travelEuropa, travelSaturn, travelNeptune } from './scenes/travel.js';
 import { moonScene } from './scenes/moon.js';
 import { asteroidScene } from './scenes/asteroid.js';
+import { europaScene } from './scenes/europa.js';
+import { saturnScene } from './scenes/saturn.js';
 
 const SCENES = {
   title: titleScene,
@@ -28,7 +30,9 @@ const SCENES = {
   travel_saturn: travelSaturn,
   travel_neptune: travelNeptune,
   moon: moonScene,
-  asteroid: asteroidScene
+  asteroid: asteroidScene,
+  europa: europaScene,
+  saturn: saturnScene
 };
 
 let canvas, ctx;

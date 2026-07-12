@@ -138,6 +138,11 @@ export function setScheme(name, opts) {
     add('up', 'arrowU', 0, 0);
     add('down', 'arrowD', 0, 0);
     add('thrust', 'fire', 0, 0);
+  } else if (name === 'swim') {
+    add('left', 'arrowL', 0, 0);
+    add('right', 'arrowR', 0, 0);
+    add('up', 'arrowU', 0, 0);
+    add('down', 'arrowD', 0, 0);
   } else if (name === 'rocket') {
     add('rotL', 'turnL', 0, 0);
     add('rotR', 'turnR', 0, 0);
@@ -153,8 +158,13 @@ function layout() {
     const b = buttons[i];
     if (b.act === 'left' || b.act === 'rotL') { b.x = bx; b.y = by; }
     if (b.act === 'right' || b.act === 'rotR') { b.x = bx + R * 2 + 34; b.y = by; }
-    if (b.act === 'up') { b.x = bx; b.y = by - R * 2 - 34; }
-    if (b.act === 'down') { b.x = bx; b.y = by; }
+    if (scheme === 'swim') {
+      if (b.act === 'up') { b.x = view.w - m - R; b.y = by - R * 2 - 34; }
+      if (b.act === 'down') { b.x = view.w - m - R; b.y = by; }
+    } else {
+      if (b.act === 'up') { b.x = bx; b.y = by - R * 2 - 34; }
+      if (b.act === 'down') { b.x = bx; b.y = by; }
+    }
     if (b.act === 'jump') { b.x = view.w - m - R; b.y = by; }
     if (b.act === 'action') { b.x = view.w - m - R * 3 - 40; b.y = by; }
     if (b.act === 'thrust') { b.x = view.w - m - R; b.y = by; }
