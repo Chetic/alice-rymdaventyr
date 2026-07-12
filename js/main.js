@@ -10,9 +10,11 @@ import { AUD } from './audio.js';
 import { HUD } from './hud.js';
 import { NAV } from './scenes/base.js';
 import { titleScene } from './scenes/title.js';
+import { homeScene } from './scenes/home.js';
 
 const SCENES = {
-  title: titleScene
+  title: titleScene,
+  home: homeScene
 };
 
 let canvas, ctx;
@@ -72,15 +74,15 @@ function loop(ts) {
 
   // fast tidssteg
   let alpha = 1;
+  let ranSteps = 0;
   if (current && !HUD.paused()) {
     acc += dtMs;
-    let steps = 0;
-    while (acc >= STEP && steps < 5) {
+    while (acc >= STEP && ranSteps < 5) {
       current.update(STEP / 1000);
       stepWorld(STEP);
       PS.update(STEP / 1000);
       acc -= STEP;
-      steps++;
+      ranSteps++;
     }
     if (acc > STEP * 5) acc = 0;
     alpha = engineRef() ? acc / STEP : 1;
@@ -96,7 +98,7 @@ function loop(ts) {
   }
   endFrame(ctx);
 
-  inputEnd();
+  inputEnd(ranSteps > 0 || HUD.blocked());
   window.requestAnimationFrame(loop);
 }
 

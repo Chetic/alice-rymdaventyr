@@ -3,7 +3,7 @@
 
 import { TAU, dist, lerp, clamp } from '../config.js';
 import { Camera, PS, drawCoin, glow } from '../render.js';
-import { initWorld, CAT, M, addSprite } from '../world.js';
+import { initWorld, CAT, M, addSprite, addToWorld } from '../world.js';
 import { addCoins } from '../save.js';
 import { AUD } from '../audio.js';
 import { HUD } from '../hud.js';
@@ -131,10 +131,12 @@ export function makeWalker(x, y, opts) {
     frictionStatic: 0.4,
     frictionAir: 0.012,
     restitution: 0,
+    sleepThreshold: Infinity,   // spelaren får aldrig somna (annars tystnar kollisionerna)
     collisionFilter: { category: CAT.PLAYER, mask: CAT.TERRAIN | CAT.PROP | CAT.SENSOR },
     label: 'alice'
   });
   M.Body.setInertia(body, Infinity);
+  addToWorld(body);
 
   const w = {
     body: body,
@@ -145,7 +147,7 @@ export function makeWalker(x, y, opts) {
     time: 0,
     groundedUntil: -1,
     speed: o.speed === undefined ? 6.4 : o.speed,       // px/steg
-    jumpV: o.jumpV === undefined ? 13.5 : o.jumpV,
+    jumpV: o.jumpV === undefined ? 15 : o.jumpV,
     ice: !!o.ice,
     frozenUntil: -1,
     spr: null

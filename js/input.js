@@ -4,6 +4,14 @@
 import { PAL, TAU } from './config.js';
 import { view, toView, rr, txt } from './render.js';
 
+// Nollad input — skickas till spelaren när dialog/paus blockerar
+export const NO_IN = {
+  ax: 0, up: false, down: false,
+  jump: false, jumpEdge: false,
+  action: false, actionEdge: false,
+  thrust: false, rotL: false, rotR: false
+};
+
 export const IN = {
   ax: 0,                 // -1..1 vänster/höger
   up: false, down: false,
@@ -222,9 +230,13 @@ function drawIcon(ctx, icon, r) {
   }
 }
 
-export function endFrame() {
-  IN.jumpEdge = false;
-  IN.actionEdge = false;
+// clearEdges=false när frame:en inte körde något fysiksteg (höga Hz-skärmar) —
+// annars tappas tryck som kom mellan stegen.
+export function endFrame(clearEdges) {
+  if (clearEdges !== false) {
+    IN.jumpEdge = false;
+    IN.actionEdge = false;
+  }
   IN.pauseEdge = false;
   IN.taps.length = 0;
 }
