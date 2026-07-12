@@ -18,6 +18,9 @@ import { moonScene } from './scenes/moon.js';
 import { asteroidScene } from './scenes/asteroid.js';
 import { europaScene } from './scenes/europa.js';
 import { saturnScene } from './scenes/saturn.js';
+import { neptuneScene } from './scenes/neptune.js';
+import { homecomingScene } from './scenes/homecoming.js';
+import { partyScene } from './scenes/party.js';
 
 const SCENES = {
   title: titleScene,
@@ -32,7 +35,10 @@ const SCENES = {
   moon: moonScene,
   asteroid: asteroidScene,
   europa: europaScene,
-  saturn: saturnScene
+  saturn: saturnScene,
+  neptune: neptuneScene,
+  homecoming: homecomingScene,
+  party: partyScene
 };
 
 let canvas, ctx;

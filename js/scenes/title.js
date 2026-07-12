@@ -59,7 +59,7 @@ class TitleScene extends SceneBase {
         if (b.id === 'start') NAV.go('home');
         else if (b.id === 'cont') NAV.go(SAVE.progress);
         else if (b.id === 'new') { resetSave(); NAV.go('home'); }
-        else if (b.id === 'free') NAV.go('freeflight');
+        else if (b.id === 'free') NAV.go('flight');   // fri flygtur bland ringarna!
         else if (b.id === 'install' && window.__installPrompt) {
           const p = window.__installPrompt;
           window.__installPrompt = null;
