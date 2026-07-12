@@ -1,0 +1,86 @@
+/* Alice och den kallaste planeten — bas-stilar.
+   OBS: håll CSS:en Chromium 79-säker (ingen flex-gap, aspect-ratio eller inset). */
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: #0b0518;
+  overflow: hidden;
+}
+
+body {
+  position: fixed;
+  top: 0;
+  left: 0;
+  font-family: "Trebuchet MS", Verdana, Arial, sans-serif;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-touch-callout: none;
+  overscroll-behavior: none;
+}
+
+#game {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  cursor: default;
+  outline: none;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #fff;
+  background: rgba(12, 5, 26, 0.97);
+  z-index: 10;
+  padding: 24px;
+}
+
+.overlay[hidden] { display: none; }
+
+.overlay h2 {
+  font-size: 30px;
+  margin: 0 0 12px 0;
+  color: #ffd9f2;
+}
+
+.overlay p {
+  font-size: 19px;
+  line-height: 1.5;
+  max-width: 620px;
+  margin: 6px 0;
+  color: #e8dcff;
+}
+
+.overlay p.small {
+  font-size: 12px;
+  color: #8a7bb0;
+  word-break: break-all;
+}
+
+.big {
+  font-size: 72px;
+  margin-bottom: 10px;
+}
+
+/* Vänd-på-plattan visas bara i porträttläge */
+#rotate { display: none; }
+
+@media (orientation: portrait) {
+  #rotate { display: flex; }
+}
