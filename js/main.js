@@ -11,10 +11,12 @@ import { HUD } from './hud.js';
 import { NAV } from './scenes/base.js';
 import { titleScene } from './scenes/title.js';
 import { homeScene } from './scenes/home.js';
+import { flightScene } from './scenes/flight.js';
 
 const SCENES = {
   title: titleScene,
-  home: homeScene
+  home: homeScene,
+  flight: flightScene
 };
 
 let canvas, ctx;

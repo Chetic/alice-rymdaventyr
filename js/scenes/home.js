@@ -439,12 +439,12 @@ function drawSkyFar(c, w, h) {
 
 function drawHillsFar(c, w, h) {
   c.fillStyle = 'rgba(120,180,140,0.75)';
-  hillPath(c, w, h, 140, 0.9);
+  hillPath(c, w, h, 140, 1, 3);
   c.fill();
 }
 function drawHillsNear(c, w, h) {
   c.fillStyle = '#69b06e';
-  hillPath(c, w, h, 120, 1.4);
+  hillPath(c, w, h, 120, 2, 5);
   c.fill();
   c.fillStyle = 'rgba(40,90,50,0.25)';
   for (let i = 0; i < 40; i++) {
@@ -453,11 +453,12 @@ function drawHillsNear(c, w, h) {
     c.fill();
   }
 }
-function hillPath(c, w, h, amp, freq) {
+// heltalsfrekvenser k1/k2 → kurvan möter sig själv vid tile-kanten
+function hillPath(c, w, h, amp, k1, k2) {
   c.beginPath();
   c.moveTo(0, h);
   for (let x = 0; x <= w; x += 16) {
-    c.lineTo(x, 130 + Math.sin((x / w) * freq * TAU) * amp + Math.sin((x / w) * freq * 3.7 * TAU) * amp * 0.3);
+    c.lineTo(x, 130 + Math.sin((x / w) * k1 * TAU) * amp + Math.sin((x / w) * k2 * TAU) * amp * 0.3);
   }
   c.lineTo(w, h);
   c.closePath();
