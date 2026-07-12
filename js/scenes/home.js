@@ -125,7 +125,7 @@ class HomeScene extends SceneBase {
 
   updateObjective() {
     const obj = [
-      'Läs pappas brev 💌',
+      'Öppna pappas brev 💌',
       'Hämta vindsnyckeln högt uppe 🔑',
       'Sätt kugghjulen på dörren ⚙️',
       'Hoppa in i flygplanet ✈️'

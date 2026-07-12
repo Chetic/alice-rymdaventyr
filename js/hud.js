@@ -20,6 +20,7 @@ function nameOf(who) {
 
 const state = {
   objective: '',
+  lastObjKey: '',
   toasts: [],           // {text, t, max}
   hintText: '', hintT: 0,
   dialog: null,         // {lines, idx, shown, cb, wrapped}
@@ -33,6 +34,7 @@ const state = {
 export const HUD = {
   reset: function (sceneName) {
     state.objective = '';
+    state.lastObjKey = '';
     state.toasts.length = 0;
     state.hintText = ''; state.hintT = 0;
     state.dialog = null;
@@ -41,7 +43,17 @@ export const HUD = {
     state.pauseEnabled = sceneName !== 'title';
   },
 
-  objective: function (text) { state.objective = text; },
+  // Målraden läses upp när den byter INNEBÖRD — inte när bara siffror
+  // tickar (ringräknare, procent). opts.silent hoppar över talet helt.
+  objective: function (text, opts) {
+    state.objective = text;
+    if (!text) { state.lastObjKey = ''; return; }
+    const key = text.replace(/[0-9]/g, '');
+    if (key !== state.lastObjKey) {
+      state.lastObjKey = key;
+      if (!opts || !opts.silent) TTS.say(text, 'narrator', { queue: true });
+    }
+  },
   toast: function (text, dur) {
     state.toasts.push({ text: text, t: 0, max: dur || 2.6 });
     TTS.say(text, 'narrator', { queue: true });
@@ -66,6 +78,8 @@ export const HUD = {
     if (!state.pauseEnabled) return;
     state.paused = !state.paused;
     AUD.sfx('click');
+    if (state.paused) TTS.say('Paus! Tryck på översta knappen när du vill spela vidare.', 'narrator');
+    else TTS.stop();
   },
 
   // Tar hand om ett tryck. true = trycket "åts upp" av UI:t.

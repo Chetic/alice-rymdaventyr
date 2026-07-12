@@ -7,6 +7,7 @@ import { setScheme, IN, NO_IN } from '../input.js';
 import { M, addToWorld, addStatic, removeBody, drawWorld, CAT, makePendulum } from '../world.js';
 import { SAVE, setFlag, flag, advanceTo } from '../save.js';
 import { AUD } from '../audio.js';
+import { TTS } from '../speech.js';
 import { HUD } from '../hud.js';
 import { drawGirl, WHO } from '../chars.js';
 import { drawRocket, drawActionBubble } from '../props.js';
@@ -260,6 +261,12 @@ class NeptuneScene extends SceneBase {
       f.x += (wind + Math.sin(this.t * 1.4 + f.ph) * f.sway) * dt;
       if (f.y > VH + 40) { f.y = -30; f.x = rand(0, W); }
       if (f.x < -40) f.x = W + 20;
+    }
+
+    // röstberättare vid isblocken
+    if (!this.blocksDone && !this.blockIntro && p.x > PUZZLE.x0 - 260) {
+      this.blockIntro = true;
+      TTS.say('Isblock! Knuffa dem, så glider de på isen ända tills de stöter emot något. Fyll båda groparna!', 'alice', { queue: true });
     }
 
     // --- isblocken ---

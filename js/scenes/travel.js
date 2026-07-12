@@ -7,6 +7,7 @@ import { setScheme, IN, NO_IN } from '../input.js';
 import { M, addToWorld, setGravity, CAT } from '../world.js';
 import { SAVE, advanceTo, flag } from '../save.js';
 import { AUD } from '../audio.js';
+import { TTS } from '../speech.js';
 import { HUD } from '../hud.js';
 import { drawRocket } from '../props.js';
 import { SceneBase, NAV } from './base.js';
@@ -62,7 +63,7 @@ class TravelScene extends SceneBase {
     this.mapT = 0;
     this.goBtn = null;
     setScheme('none');
-    HUD.objective('Karta: nästa stopp — ' + this.cfg.name + ' ' + this.cfg.emoji);
+    HUD.objective('Nästa stopp: ' + this.cfg.name + ' ' + this.cfg.emoji + ' — tryck på ÅK!');
 
     // stjärnhimmel byggs för flygfasen
     this.par = new Parallax();
@@ -112,7 +113,8 @@ class TravelScene extends SceneBase {
       }
     }
 
-    HUD.objective('→ ' + this.cfg.name + ' ' + this.cfg.emoji + '  0%');
+    HUD.objective('→ ' + this.cfg.name + ' ' + this.cfg.emoji + '  0%', { silent: true });
+    TTS.say('Nu flyger vi mot ' + this.cfg.name + '! Snurra med pilarna och ge fart med elden!', 'alice', { queue: true });
     if (!flag('trav_' + this.target)) {
       HUD.dialog([{ who: 'alice', text: this.cfg.intro }]);
       // markera intro som visad utan att spara-fila i onödan
@@ -184,7 +186,7 @@ class TravelScene extends SceneBase {
     // progress + landningsfas
     if (this.phase === 'fly') {
       const prog = clamp(Math.round(p.x / (LEN - 1400) * 100), 0, 100);
-      HUD.objective('→ ' + this.cfg.name + ' ' + this.cfg.emoji + '  ' + prog + '%');
+      HUD.objective('→ ' + this.cfg.name + ' ' + this.cfg.emoji + '  ' + prog + '%', { silent: true });
       if (p.x > LEN - 1400) {
         this.phase = 'land';
         setGravity(this.cfg.grav);

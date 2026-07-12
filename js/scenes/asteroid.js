@@ -7,6 +7,7 @@ import { setScheme, IN, NO_IN } from '../input.js';
 import { M, addToWorld, addStatic, addSprite, removeBody, drawWorld, CAT, linkBodies, pinTo } from '../world.js';
 import { SAVE, setFlag, flag, advanceTo, addCoins, spendCoins, coinTotal, persist } from '../save.js';
 import { AUD } from '../audio.js';
+import { TTS } from '../speech.js';
 import { HUD } from '../hud.js';
 import { drawGirl, WHO } from '../chars.js';
 import { drawRocket, drawActionBubble } from '../props.js';
@@ -207,6 +208,12 @@ class AsteroidScene extends SceneBase {
       if (this.nodes[i].cd > 0) this.nodes[i].cd -= dt;
     }
 
+    // röstberättare vid vågen
+    if (!this.vaultOpen && !this.scaleIntro && Math.abs(p.x - SCALE_X) < 420) {
+      this.scaleIntro = true;
+      TTS.say('Vågen ska väga precis jämnt! Guldtackan väger lika mycket som TRE silvermynt. Dra mynt till den tomma skålen!', 'narrator', { queue: true });
+    }
+
     // interaktioner
     this.near = null;
     if (!blocked) {
@@ -331,6 +338,7 @@ class AsteroidScene extends SceneBase {
       ]);
     } else {
       this.shopOpen = true;
+      TTS.say('Lägg mynt på disken tills det blir exakt 60! Guld är värt 10 och silver 5.', 'nastya', { queue: true });
     }
   }
 
@@ -368,18 +376,18 @@ class AsteroidScene extends SceneBase {
       if (SAVE.coins.gold - this.pay.gold > 0) {
         this.pay.gold++;
         AUD.sfx('coinG');
-        if (total + 10 > SUIT_PRICE) HUD.toast('Oj, det blev för mycket! 🤭');
+        this.speakTotal();
       } else AUD.sfx('wrong');
     } else if (id === 'addSilver') {
       if (SAVE.coins.silver - this.pay.silver > 0) {
         this.pay.silver++;
         AUD.sfx('coinS');
-        if (total + 5 > SUIT_PRICE) HUD.toast('Oj, det blev för mycket! 🤭');
+        this.speakTotal();
       } else AUD.sfx('wrong');
     } else if (id === 'removeGold') {
-      if (this.pay.gold > 0) { this.pay.gold--; AUD.sfx('pop'); }
+      if (this.pay.gold > 0) { this.pay.gold--; AUD.sfx('pop'); this.speakTotal(); }
     } else if (id === 'removeSilver') {
-      if (this.pay.silver > 0) { this.pay.silver--; AUD.sfx('pop'); }
+      if (this.pay.silver > 0) { this.pay.silver--; AUD.sfx('pop'); this.speakTotal(); }
     } else if (id === 'buy') {
       if (total === SUIT_PRICE) {
         spendCoins(this.pay.gold, this.pay.silver);
@@ -570,6 +578,14 @@ class AsteroidScene extends SceneBase {
     if (!this.vaultOpen) {
       txt(ctx, '⚖️ Väg JÄMNT så öppnas valvet!', SCALE_X, 400, { size: 26, bold: true, color: '#ffe9b3', stroke: 'rgba(40,20,0,0.7)', strokeW: 5 });
     }
+  }
+
+  // räkna högt: myntsumman på disken (smygmatte + funkar utan läsning)
+  speakTotal() {
+    const t2 = this.pay.gold * 10 + this.pay.silver * 5;
+    if (t2 === SUIT_PRICE) TTS.say('Exakt 60! Tryck på BETALA!', 'nastya');
+    else if (t2 > SUIT_PRICE) HUD.toast('Oj, det blev för mycket! 🤭');
+    else TTS.say(String(t2), 'nastya');
   }
 
   drawShop(ctx, t) {

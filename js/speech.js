@@ -39,10 +39,12 @@ function pickVoice() {
 
 function clean(text) {
   let x = String(text);
+  x = x.replace(/(\d)\s*\/\s*(\d)/g, '$1 av $2');   // "3/12" → "3 av 12"
+  x = x.replace(/•/g, ' och ');
   try {
     x = x.replace(/\p{Extended_Pictographic}/gu, '');
   } catch (e) { /* äldre motor utan property escapes — läs som det är */ }
-  x = x.replace(/[•♪♫★⭐✨🌈→←↺↻▲▼]/g, '');
+  x = x.replace(/[♪♫★⭐✨🌈→←↺↻▲▼—]/g, ' ');
   x = x.replace(/\s+/g, ' ').trim();
   return x;
 }

@@ -44,6 +44,7 @@ class TitleScene extends SceneBase {
     if (!this.greeted && AUD.ready) {
       this.greeted = true;
       TTS.say('Hej! Jag heter Alice! Ska vi flyga ut i rymden och hämta pappa?', 'alice', { queue: true });
+      TTS.say('Tryck på den stora rosa knappen, så börjar vi!', 'alice', { queue: true });
     }
     this.shootTimer -= dt;
     if (this.shootTimer <= 0 && !this.shoot) {

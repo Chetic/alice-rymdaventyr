@@ -40,6 +40,7 @@ class SpaceportScene extends SceneBase {
     addStatic(W + 40, VH / 2, 80, VH * 2);
 
     this.done = { code: flag('spCode'), fuel: flag('spFuel'), cone: flag('spCone') };
+    this.codeIntro = this.done.code;
     this.launching = false;
     this.launchT = 0;
     this.rocketY = 0;
@@ -284,6 +285,14 @@ class SpaceportScene extends SceneBase {
       }
     }
     for (let i = 0; i < 3; i++) if (this.tankFlash[i] > 0) this.tankFlash[i] -= dt;
+
+    // röstberättare vid kodpanelen: läs talen högt (Alice kan inte läsa än!)
+    if (!this.done.code && !this.codeIntro && Math.abs(p.x - PANEL_X) < 460 && !HUD.blocked()) {
+      this.codeIntro = true;
+      HUD.dialog([
+        { who: 'alice', text: 'Pappas kod! Tre plus fyra… åtta minus sex… och ett plus fyra. Snurra rattarna till rätt svar! 🔢' }
+      ]);
+    }
 
     // --- interaktion ---
     this.near = null;

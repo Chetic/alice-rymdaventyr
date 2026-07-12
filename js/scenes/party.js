@@ -6,6 +6,7 @@ import { view, makeCanvas, PS, txt, glow, QY, rr, rainbowText, heartPath, starPa
 import { setScheme } from '../input.js';
 import { SAVE, persist, advanceTo } from '../save.js';
 import { AUD } from '../audio.js';
+import { TTS } from '../speech.js';
 import { HUD } from '../hud.js';
 import { drawGirl, drawMermaid, drawUnicorn, WHO } from '../chars.js';
 import { SceneBase, NAV } from './base.js';
@@ -29,6 +30,7 @@ class PartyScene extends SceneBase {
     this.confT = 0;
     this.fwT = 1.2;
     this.creditT = 0;
+    this.saidEnd = false;
     this.btn = null;
     HUD.objective('');
     const self = this;
@@ -65,6 +67,10 @@ class PartyScene extends SceneBase {
       AUD.sfx('pop');
     }
     if (!HUD.dialogActive()) this.creditT += dt;
+    if (!this.saidEnd && this.creditT > 10) {
+      this.saidEnd = true;
+      TTS.say('Du klarade hela rymdresan! Ett spel av Alice och pappa. HURRA!', 'papa', { queue: true });
+    }
   }
 
   onTap(x, y) {
